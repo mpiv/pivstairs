@@ -20,7 +20,7 @@ const int NUMLED[] = {49, 49, 53, 57, 49, 46, 45, 45, 45, 45, 45, 45, 45, 45};
 const int PIN[] = {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
 
 // Let's declare our ledstrips
-Adafruit_NeoPixel strip[14];
+Adafruit_NeoPixel strip[NUMSTEPS];
 
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
