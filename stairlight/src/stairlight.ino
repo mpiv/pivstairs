@@ -35,8 +35,8 @@ Adafruit_NeoPixel strip[NUMSTEPS];
 
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
-uint8_t goUp = false;
-uint8_t goDown = false;
+uint8_t goUp = 0;
+uint8_t goDown = 0;
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
