@@ -47,12 +47,14 @@ void initStrips() {
 	}
 }
 
-uint64_t calculateColor(uint8_t r, uint8_t g, uint8_t b) {
-	uint64_t color;
+// We calculate a color 32 bit word based on R, G and B values
+uint32_t calculateColor(uint8_t r, uint8_t g, uint8_t b) {
+	uint32_t color;
 	color = ((256*256*r)+(256*g)+b);
 	return color;
 }
 
+// We use this function to light the strip number n
 void stepOn(uint8_t n, uint32_t ledColor) {
 	for (uint8_t i = 0; i < NUMLED[n]; i++){
   	strip[n].setPixelColor(i, ledColor);
@@ -60,6 +62,7 @@ void stepOn(uint8_t n, uint32_t ledColor) {
 	strip[n].show();
 }
 
+// We use this function to turn off the strip number n
 void stepOff(uint8_t n) {
 	for (uint8_t i = 0; i < NUMLED[n]; i++){
   	strip[n].setPixelColor(i, LED_OFF);
