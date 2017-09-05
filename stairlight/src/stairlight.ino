@@ -37,6 +37,7 @@ uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
 uint8_t goUp = 0;
 uint8_t goDown = 0;
+uint16_t delayval = 300;
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
@@ -70,14 +71,25 @@ void stepOff(uint8_t n) {
 	strip[n].show();
 }
 
-void backgroundAnim(bool direction) {
-	for (uint8_t i = 0; i < NUMSTEPS; i++) {
-		if (direction == true) {
-			stepOn(i, lowBrightnessColor);
+// Here is the code for the lighting animation
+void stairAnim(bool direction) {
+	if ((goUp == true) && (goDown == false)) {
+		for (uint8_t i = 0; i < NUMSTEPS; i++) {
+				stepOn(i, lowBrightnessColor);
+				delay(delayval);
 		}
-		else if (goDown == true) {
-			uint8_t j = NUMSTEPS - 1 - i;
-			stepOff(i);
+	}
+	else if ((goUp == false) && (goDown == true)) {
+		for (uint8_t i = 0; i < NUMSTEPS; i++) {
+				uint8_t j = NUMSTEPS - 1 - i;
+				stepOn(j, lowBrightnessColor);
+				delay(delayval);
+		}
+	}
+	else if ((goUp == true) && (goDown == true)) {
+		for (uint8_t i = 0; i < NUMSTEPS; i++) {
+				uint8_t j = NUMSTEPS - 1 - i;
+				stepOn(j, lowBrightnessColor);
 		}
 	}
 }
