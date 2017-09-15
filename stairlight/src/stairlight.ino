@@ -35,9 +35,13 @@ Adafruit_NeoPixel strip[NUMSTEPS];
 
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
+uint32_t red = 0;
+uint32_t blue = 0;
+uint32_t green = 0;
 uint8_t goUp = 0;
 uint8_t goDown = 0;
-uint16_t delayval = 300;
+uint16_t longDelay = 750;
+uint16_t shortDelay = 300;
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
@@ -72,33 +76,30 @@ void stepOff(uint8_t n) {
 }
 
 // Here is the code for the lighting animation
-void stairAnim(bool direction) {
-	if ((goUp == true) && (goDown == false)) {
-		for (uint8_t i = 0; i < NUMSTEPS; i++) {
-				stepOn(i, lowBrightnessColor);
-				delay(delayval);
-		}
+
+void goUpAnim() {
+	for (uint8_t i = 0; i < NUMSTEPS; i++) {
+			stepOn(i, lowBrightnessColor);
+			delay(shortDelay);
 	}
-	else if ((goUp == false) && (goDown == true)) {
-		for (uint8_t i = 0; i < NUMSTEPS; i++) {
-				uint8_t j = NUMSTEPS - 1 - i;
-				stepOn(j, lowBrightnessColor);
-				delay(delayval);
-		}
+	for (uint8_t i = 0; i < 3; i++) {
+		stepOn(i, highBrightnessColor);
 	}
-	else if ((goUp == true) && (goDown == true)) {
-		for (uint8_t i = 0; i < NUMSTEPS; i++) {
-				uint8_t j = NUMSTEPS - 1 - i;
-				stepOn(j, lowBrightnessColor);
-		}
+}
+
+void goDownAnim() {
+	for (uint8_t i = 0; i < NUMSTEPS; i++) {
+			uint8_t j = NUMSTEPS - 1 - i;
+			stepOn(j, lowBrightnessColor);
+			delay(shortDelay);
 	}
 }
 
 // In this function we first switch on a step and then we wait a delay before we switch it off
 // We need to pass the number of the step and the delay in ms
-void stepOnFewInstants(uint8_t n, uint32_t delayval) {
+void stepOnFewInstants(uint8_t n, uint32_t longDelay) {
 	stepOn(n, highBrightnessColor);
-	delay(delayval);
+	delay(longDelay);
 	stepOff(n);
 }
 
@@ -119,6 +120,9 @@ void setup() {
 	}
 	highBrightnessColor = calculateColor(HIGH_R, HIGH_G, HIGH_B);
 	lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
+	red = calculateColor(64, 0, 0);
+	blue = calculateColor(0, 64, 0);
+	green = calculateColor(0, 0, 64);
 }
 
 void loop() {
