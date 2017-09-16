@@ -36,16 +36,19 @@ Let's define which pins will be used for each strip
 */
 const uint8_t PIN[] = {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
 
+// Let's define the input pins for PIR sensors
+const uint8_t topPirPin = 2;
+const uint8_t bottomPirPin = 3;
+
 // Let's declare our ledstrips
 Adafruit_NeoPixel strip[NUMSTEPS];
 
+// Let's declare some variables
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
 uint32_t red = 0;
 uint32_t blue = 0;
 uint32_t green = 0;
-uint8_t goUp = 0;
-uint8_t goDown = 0;
 uint16_t longDelay = 750;
 uint16_t shortDelay = 75;
 
