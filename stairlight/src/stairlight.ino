@@ -1,13 +1,17 @@
-// Neopixel stair lighting sketch - 2016 - Manuel Pivert
-// Inspired from NeoPixel Ring simple sketch (c) 2013 Shae Erisson
-// released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
+/*
+Neopixel stair lighting sketch - 2016 - Manuel Pivert
+Inspired from NeoPixel Ring simple sketch (c) 2013 Shae Erisson
+released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
+*/
 
 // We include the Neopixel library
 #include <Adafruit_NeoPixel.h>
 
-// The stair has NUMSTEPS steps
-// There is one NeoPixel strip on each step
-// As the steps do not have the same size, the number of NeoPixel leds is not the same on each step
+/*
+The stair has NUMSTEPS steps
+There is one NeoPixel strip on each step
+As the steps do not have the same size, the number of NeoPixel leds is not the same on each step
+*/
 
 // How many steps has the stair?
 const uint8_t NUMSTEPS = 14;
@@ -20,14 +24,16 @@ const uint8_t LOW_R = 16;
 const uint8_t LOW_G = 16;
 const uint8_t LOW_B = 24;
 
-
+// pixels.Color is 0,0,0 for the leds switched off
 const uint8_t LED_OFF = 0;
 
 // Let's define how many NeoPixel leds are on each strip
 const uint8_t NUMLED[] = {49, 49, 53, 57, 49, 46, 45, 45, 45, 45, 45, 45, 45, 45};
 
-// We connect each strip to different pins on the Arduino
-// Let's define which pins will be used for each strip
+/*
+We connect each strip to different pins on the Arduino
+Let's define which pins will be used for each strip
+*/
 const uint8_t PIN[] = {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
 
 // Let's declare our ledstrips
@@ -41,11 +47,13 @@ uint32_t green = 0;
 uint8_t goUp = 0;
 uint8_t goDown = 0;
 uint16_t longDelay = 750;
-uint16_t shortDelay = 300;
+uint16_t shortDelay = 75;
 
-// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
-// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
-// example for more information on possible values.
+/*
+When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
+Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
+example for more information on possible values.
+*/
 void initStrips() {
 	for (uint8_t i = 0; i < NUMSTEPS; i++) {
 	strip[i] = Adafruit_NeoPixel(NUMLED[i], PIN[i], NEO_GRB + NEO_KHZ800);
@@ -75,31 +83,78 @@ void stepOff(uint8_t n) {
 	strip[n].show();
 }
 
-// Here is the code for the lighting animation
 
+/*
+Here is the code for the lighting animation,
+one for going upstairs and one for going downstairs
+for each we first light all the steps with low brightness
+and then we light a group of 3 steps with high brightness
+then we "move" this 3 steps group through the stair
+at las we switch off all the steps
+*/
 void goUpAnim() {
-	for (uint8_t i = 0; i < NUMSTEPS; i++) {
-			stepOn(i, lowBrightnessColor);
-			delay(shortDelay);
+	for (uint8_t i = 0; i < NUMSTEPS; i++) { // lighting all steps with "background" low brightness
+		stepOn(i, lowBrightnessColor);
+		delay(shortDelay);
 	}
-	for (uint8_t i = 0; i < 3; i++) {
-		stepOn(i, highBrightnessColor);
+	for (uint8_t i = 0; i < 3; i++) { // lighting a group of 3 steps with high brightness
+		stepOn(i, blue);
+		delay(longDelay);
+	}
+	for (uint8_t i = 3; i < NUMSTEPS; i++) { // "moving" our 3 steps group through the stair
+		stepOn(i, blue);
+		uint8_t j = i - 3;
+		stepOn(j, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (uint8_t i = NUMSTEPS - 3; i < NUMSTEPS; i++) { // terminating the "move" of the 3 steps group
+		stepOn(i, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (uint8_t i = 0; i < NUMSTEPS; i++) { // switching off all the steps
+		stepOff(i);
+		delay(shortDelay);
 	}
 }
 
+// the same as above but moving downstairs !
 void goDownAnim() {
 	for (uint8_t i = 0; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, lowBrightnessColor);
+		delay(shortDelay);
+	}
+	for (uint8_t i = 0; i < 3; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, green);
+		delay(longDelay);
+	}
+	for (uint8_t i = 3; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, green);
+		uint8_t k = j + 3;
+		stepOn(k, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (size_t i = NUMSTEPS - 3; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (uint8_t i = 0; i < NUMSTEPS; i++) {
 			uint8_t j = NUMSTEPS - 1 - i;
-			stepOn(j, lowBrightnessColor);
+			stepOff(j);
 			delay(shortDelay);
 	}
 }
 
-// In this function we first switch on a step and then we wait a delay before we switch it off
-// We need to pass the number of the step and the delay in ms
-void stepOnFewInstants(uint8_t n, uint32_t longDelay) {
+/*
+In this function we first switch on a step and then we wait a delay before we switch it off
+We need to pass the number of the step and the delay in ms
+*/
+void stepOnFewInstants(uint8_t n, uint32_t someDelay) {
 	stepOn(n, highBrightnessColor);
-	delay(longDelay);
+	delay(someDelay);
 	stepOff(n);
 }
 
@@ -126,7 +181,5 @@ void setup() {
 }
 
 void loop() {
-
-  // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
 
 }
