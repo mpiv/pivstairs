@@ -17,11 +17,11 @@ As the steps do not have the same size, the number of NeoPixel leds is not the s
 const uint8_t NUMSTEPS = 14;
 
 // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-const uint8_t HIGH_R = 64;
-const uint8_t HIGH_G = 64;
+const uint32_t HIGH_R = 64;
+const uint16_t HIGH_G = 64;
 const uint8_t HIGH_B = 96;
-const uint8_t LOW_R = 16;
-const uint8_t LOW_G = 16;
+const uint32_t LOW_R = 16;
+const uint16_t LOW_G = 16;
 const uint8_t LOW_B = 24;
 
 // pixels.Color is 0,0,0 for the leds switched off
@@ -47,9 +47,9 @@ Adafruit_NeoPixel strip[NUMSTEPS];
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
 uint32_t red = 0;
-uint32_t blue = 0;
 uint32_t green = 0;
-uint16_t longDelay = 750;
+uint32_t blue = 0;
+uint16_t longDelay = 1000;
 uint16_t shortDelay = 75;
 
 /*
@@ -66,7 +66,10 @@ void initStrips() {
 // We calculate a color 32 bit word based on R, G and B values
 uint32_t calculateColor(uint8_t r, uint8_t g, uint8_t b) {
 	uint32_t color;
-	color = ((256*256*r)+(256*g)+b);
+	uint32_t redVal = (uint32_t)r << 16;
+	uint16_t greenVal = (uint32_t)g << 8;
+	uint8_t blueVal = (uint32_t)b << 0;
+	color = redVal + greenVal + blueVal;
 	return color;
 }
 
@@ -101,11 +104,11 @@ void goUpAnim() {
 		delay(shortDelay);
 	}
 	for (uint8_t i = 0; i < 3; i++) { // lighting a group of 3 steps with high brightness
-		stepOn(i, blue);
+		stepOn(i, red);
 		delay(longDelay);
 	}
 	for (uint8_t i = 3; i < NUMSTEPS; i++) { // "moving" our 3 steps group through the stair
-		stepOn(i, blue);
+		stepOn(i, red);
 		uint8_t j = i - 3;
 		stepOn(j, lowBrightnessColor);
 		delay(longDelay);
@@ -129,12 +132,12 @@ void goDownAnim() {
 	}
 	for (uint8_t i = 0; i < 3; i++) {
 		uint8_t j = NUMSTEPS - 1 - i;
-		stepOn(j, green);
+		stepOn(j, blue);
 		delay(longDelay);
 	}
 	for (uint8_t i = 3; i < NUMSTEPS; i++) {
 		uint8_t j = NUMSTEPS - 1 - i;
-		stepOn(j, green);
+		stepOn(j, blue);
 		uint8_t k = j + 3;
 		stepOn(k, lowBrightnessColor);
 		delay(longDelay);
@@ -169,6 +172,7 @@ void setup() {
 	}
 
 // Starting to work with our ledstrips
+initStrips();
 	for (uint8_t i = 0; i < NUMSTEPS; i++) {
 		strip[i].begin();
 		for (uint8_t j = 0; j < NUMLED[i]; j++){
@@ -176,13 +180,16 @@ void setup() {
 			}
 		strip[i].show(); // To actually see colors we previously set
 	}
-	highBrightnessColor = calculateColor(HIGH_R, HIGH_G, HIGH_B);
-	lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
-	red = calculateColor(64, 0, 0);
-	blue = calculateColor(0, 64, 0);
-	green = calculateColor(0, 0, 64);
+highBrightnessColor = calculateColor(HIGH_R, HIGH_G, HIGH_B);
+lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
+red = calculateColor(64, 0, 0);
+blue = calculateColor(0, 64, 0);
+green = calculateColor(0, 0, 64);
 }
 
 void loop() {
-
+	goUpAnim();
+	delay(3000);
+	goDownAnim();
+	delay(3000);
 }
