@@ -26,7 +26,8 @@ void loop(){
       // We only want to print on the output change, not state
       pirState = HIGH;
     }
-  } else {
+  }
+  else {
     digitalWrite(ledPin, LOW); // turn LED OFF
     if (pirState == HIGH){
       // we have just turned of
