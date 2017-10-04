@@ -18,10 +18,10 @@ const uint8_t NUMSTEPS = 14;
 
 // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
 const uint32_t HIGH_R = 64;
-const uint16_t HIGH_G = 64;
+const uint16_t HIGH_G = 70;
 const uint8_t HIGH_B = 96;
 const uint32_t LOW_R = 16;
-const uint16_t LOW_G = 16;
+const uint16_t LOW_G = 20;
 const uint8_t LOW_B = 24;
 
 // pixels.Color is 0,0,0 for the leds switched off
@@ -104,11 +104,11 @@ void goUpAnim() {
 		delay(shortDelay);
 	}
 	for (uint8_t i = 0; i < 3; i++) { // lighting a group of 3 steps with high brightness
-		stepOn(i, red);
+		stepOn(i, highBrightnessColor);
 		delay(longDelay);
 	}
 	for (uint8_t i = 3; i < NUMSTEPS; i++) { // "moving" our 3 steps group through the stair
-		stepOn(i, red);
+		stepOn(i, highBrightnessColor);
 		uint8_t j = i - 3;
 		stepOn(j, lowBrightnessColor);
 		delay(longDelay);
@@ -132,12 +132,12 @@ void goDownAnim() {
 	}
 	for (uint8_t i = 0; i < 3; i++) {
 		uint8_t j = NUMSTEPS - 1 - i;
-		stepOn(j, blue);
+		stepOn(j, highBrightnessColor);
 		delay(longDelay);
 	}
 	for (uint8_t i = 3; i < NUMSTEPS; i++) {
 		uint8_t j = NUMSTEPS - 1 - i;
-		stepOn(j, blue);
+		stepOn(j, highBrightnessColor);
 		uint8_t k = j + 3;
 		stepOn(k, lowBrightnessColor);
 		delay(longDelay);
@@ -166,7 +166,7 @@ void stepOnFewInstants(uint8_t n, uint32_t someDelay) {
 
 void setup() {
 
-// Setting pins to OUTPUT mode
+// Setting pins to OUTPUT mode for led strips
 	for (uint8_t i = PIN[0]; i <= PIN[13]; i++) {
 		pinMode(i, OUTPUT);
 	}
@@ -183,8 +183,8 @@ initStrips();
 highBrightnessColor = calculateColor(HIGH_R, HIGH_G, HIGH_B);
 lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
 red = calculateColor(64, 0, 0);
-blue = calculateColor(0, 64, 0);
-green = calculateColor(0, 0, 64);
+green = calculateColor(0, 64, 0);
+blue = calculateColor(0, 0, 64);
 }
 
 void loop() {
