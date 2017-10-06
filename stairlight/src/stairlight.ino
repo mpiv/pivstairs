@@ -51,6 +51,9 @@ uint32_t green = 0;
 uint32_t blue = 0;
 uint16_t longDelay = 1000;
 uint16_t shortDelay = 75;
+uint16_t goingDelay = 3000;
+uint8_t upGoing = 0;
+uint8_t downGoing = 0;
 
 /*
 When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
@@ -171,6 +174,10 @@ void setup() {
 		pinMode(i, OUTPUT);
 	}
 
+// Setting pins to INPUT mode for PIR sensors
+	pinMode(topPirPin, INPUT);
+	pinMode(bottomPirPin, INPUT);
+
 // Starting to work with our ledstrips
 initStrips();
 	for (uint8_t i = 0; i < NUMSTEPS; i++) {
@@ -188,8 +195,19 @@ blue = calculateColor(0, 0, 64);
 }
 
 void loop() {
-	goUpAnim();
+	upGoing = digitalRead(bottomPirPin); // Read value of bottom PIR sensor
+	if (upGoing == HIGH) { // if motion detected, launches the go up animation
+		goUpAnim();
+		delay(goingDelay);
+	}
+	downGoing = digitalRead(topPirPin); // Read value of top PIR sensor
+	if (downGoing == HIGH) { // if motion detected, launches the go down animation
+		goDownAnim();
+		delay(goingDelay);
+	}
+	delay(shortDelay);
+	/*goUpAnim();
 	delay(3000);
 	goDownAnim();
-	delay(3000);
+	delay(3000);*/
 }
