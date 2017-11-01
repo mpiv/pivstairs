@@ -50,9 +50,11 @@ uint32_t red = 0;
 uint32_t green = 0;
 uint32_t blue = 0;
 uint32_t yellow = 0;
-uint16_t longDelay = 750;
+uint16_t longDelay = 800;
 uint16_t shortDelay = 75;
-uint16_t waitDelay = 3000;
+uint16_t arrivedUpDelay = 7000;
+uint16_t wantToGoDownDelay = 7000;
+uint16_t offDelay = 2000;
 uint8_t upGoing = 0;
 uint8_t downGoing = 0;
 
@@ -111,6 +113,7 @@ void goUpAnim() {
 		stepOn(i, highBrightnessColor);
 		//delay(longDelay);
 	}
+	delay(2 * longDelay);
 	for (uint8_t i = 3; i < NUMSTEPS; i++) { // "moving" our 3 steps group through the stair
 		stepOn(i, highBrightnessColor);
 		uint8_t j = i - 3;
@@ -121,7 +124,7 @@ void goUpAnim() {
 		stepOn(i, lowBrightnessColor);
 		delay(longDelay);
 	}
-	delay(waitDelay);
+	delay(arrivedUpDelay);
 	for (uint8_t i = 0; i < NUMSTEPS; i++) { // switching off all the steps
 		stepOff(i);
 		delay(shortDelay);
@@ -140,7 +143,7 @@ void goDownAnim() {
 		stepOn(j, highBrightnessColor);
 		//delay(longDelay);
 	}
-	delay(waitDelay);
+	delay(wantToGoDownDelay);
 	for (uint8_t i = 3; i < NUMSTEPS; i++) {
 		uint8_t j = NUMSTEPS - 1 - i;
 		stepOn(j, highBrightnessColor);
@@ -202,12 +205,12 @@ void loop() {
 	upGoing = digitalRead(bottomPirPin); // Read value of bottom PIR sensor
 	if (upGoing == HIGH) { // if motion detected, launches the go up animation
 		goUpAnim();
-		delay(waitDelay);
+		delay(offDelay);
 	}
 	downGoing = digitalRead(topPirPin); // Read value of top PIR sensor
 	if (downGoing == HIGH) { // if motion detected, launches the go down animation
 		goDownAnim();
-		delay(waitDelay);
+		delay(offDelay);
 	}
 	delay(shortDelay);
 	/*goUpAnim();
