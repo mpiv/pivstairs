@@ -50,8 +50,8 @@ uint32_t red = 0;
 uint32_t green = 0;
 uint32_t blue = 0;
 uint32_t yellow = 0;
-uint16_t longDelay = 800;
-uint16_t shortDelay = 75;
+uint16_t longDelay = 700;
+uint16_t shortDelay = 70;
 uint16_t arrivedUpDelay = 7000;
 uint16_t wantToGoDownDelay = 7000;
 uint16_t offDelay = 2000;
@@ -87,6 +87,25 @@ void stepOn(uint8_t n, uint32_t ledColor) {
 	strip[n].show();
 }
 
+// We use this function to light the strip number n, but with style !
+void leftSlideStepOn(uint8_t n, uint32_t ledColor) {
+	for (uint8_t i = 0; i < NUMLED[n]; i++){
+  	strip[n].setPixelColor(i, ledColor);
+		strip[n].show();
+		delay(1);
+  	}
+}
+
+// We use this function to light the strip number n, but with style !
+void rightSlideStepOn(uint8_t n, uint32_t ledColor) {
+	for (uint8_t i = 0; i < NUMLED[n]; i++){
+		uint8_t j = NUMLED[n] - 1 - i;
+		strip[n].setPixelColor(j, ledColor);
+		strip[n].show();
+		delay(1);
+  	}
+}
+
 // We use this function to turn off the strip number n
 void stepOff(uint8_t n) {
 	for (uint8_t i = 0; i < NUMLED[n]; i++){
@@ -94,7 +113,6 @@ void stepOff(uint8_t n) {
   	}
 	strip[n].show();
 }
-
 
 /*
 Here is the code for the lighting animation,
@@ -163,6 +181,65 @@ void goDownAnim() {
 	}
 }
 
+void goUpStyleAnim() {
+	for (uint8_t i = 0; i < NUMSTEPS; i++) { // lighting all steps with "background" low brightness
+		stepOn(i, lowBrightnessColor);
+		delay(shortDelay);
+	}
+	for (uint8_t i = 0; i < 3; i++) { // lighting a group of 3 steps with high brightness
+		stepOn(i, highBrightnessColor);
+		//delay(longDelay);
+	}
+	delay(2 * longDelay);
+	for (uint8_t i = 3; i < NUMSTEPS; i++) { // "moving" our 3 steps group through the stair
+		uint8_t j = i - 3;
+		rightSlideStepOn(j, lowBrightnessColor);
+		leftSlideStepOn(i, highBrightnessColor);
+		delay(longDelay);
+	}
+	delay(arrivedUpDelay);
+	for (uint8_t i = NUMSTEPS - 3; i < NUMSTEPS; i++) { // terminating the "move" of the 3 steps group
+		rightSlideStepOn(i, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (uint8_t i = 0; i < NUMSTEPS; i++) { // switching off all the steps
+		stepOff(i);
+		delay(shortDelay);
+	}
+}
+
+// the same as above but moving downstairs !
+void goDownStyleAnim() {
+	for (uint8_t i = 0; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, lowBrightnessColor);
+		delay(shortDelay);
+	}
+	for (uint8_t i = 0; i < 3; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		stepOn(j, highBrightnessColor);
+		//delay(longDelay);
+	}
+	delay(wantToGoDownDelay);
+	for (uint8_t i = 3; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		uint8_t k = j + 3;
+		rightSlideStepOn(k, lowBrightnessColor);
+		leftSlideStepOn(j, highBrightnessColor);
+		delay(longDelay);
+	}
+	for (size_t i = NUMSTEPS - 3; i < NUMSTEPS; i++) {
+		uint8_t j = NUMSTEPS - 1 - i;
+		rightSlideStepOn(j, lowBrightnessColor);
+		delay(longDelay);
+	}
+	for (uint8_t i = 0; i < NUMSTEPS; i++) {
+			uint8_t j = NUMSTEPS - 1 - i;
+			stepOff(j);
+			delay(shortDelay);
+	}
+}
+
 /*
 In this function we first switch on a step and then we wait a delay before we switch it off
 We need to pass the number of the step and the delay in ms
@@ -204,12 +281,12 @@ yellow = calculateColor(64, 64, 0);
 void loop() {
 	upGoing = digitalRead(bottomPirPin); // Read value of bottom PIR sensor
 	if (upGoing == HIGH) { // if motion detected, launches the go up animation
-		goUpAnim();
+		goUpStyleAnim();
 		delay(offDelay);
 	}
 	downGoing = digitalRead(topPirPin); // Read value of top PIR sensor
 	if (downGoing == HIGH) { // if motion detected, launches the go down animation
-		goDownAnim();
+		goDownStyleAnim();
 		delay(offDelay);
 	}
 	delay(shortDelay);
