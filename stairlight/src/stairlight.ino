@@ -120,11 +120,11 @@ void goUpAnim() {
 		stepOn(j, lowBrightnessColor);
 		delay(longDelay);
 	}
+	delay(arrivedUpDelay);
 	for (uint8_t i = NUMSTEPS - 3; i < NUMSTEPS; i++) { // terminating the "move" of the 3 steps group
 		stepOn(i, lowBrightnessColor);
 		delay(longDelay);
 	}
-	delay(arrivedUpDelay);
 	for (uint8_t i = 0; i < NUMSTEPS; i++) { // switching off all the steps
 		stepOff(i);
 		delay(shortDelay);
