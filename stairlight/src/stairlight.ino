@@ -17,12 +17,12 @@ As the steps do not have the same size, the number of NeoPixel leds is not the s
 const uint8_t NUMSTEPS = 14;
 
 // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-const uint32_t HIGH_R = 64;
-const uint16_t HIGH_G = 70;
-const uint8_t HIGH_B = 96;
-const uint32_t LOW_R = 16;
-const uint16_t LOW_G = 20;
-const uint8_t LOW_B = 24;
+const uint32_t HIGH_R = 64; // 64
+const uint16_t HIGH_G = 70; // 70
+const uint8_t HIGH_B = 96; // 96
+const uint32_t LOW_R = 16; // 16
+const uint16_t LOW_G = 20; // 20
+const uint8_t LOW_B = 24; // 24
 
 // pixels.Color is 0,0,0 for the leds switched off
 const uint8_t LED_OFF = 0;
@@ -46,11 +46,7 @@ Adafruit_NeoPixel strip[NUMSTEPS];
 // Let's declare some variables
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
-uint32_t red = 0;
-uint32_t green = 0;
-uint32_t blue = 0;
-uint32_t yellow = 0;
-uint16_t longDelay = 700;
+uint16_t longDelay = 600;
 uint16_t shortDelay = 70;
 uint16_t arrivedUpDelay = 7000;
 uint16_t wantToGoDownDelay = 7000;
@@ -79,10 +75,28 @@ uint32_t calculateColor(uint8_t r, uint8_t g, uint8_t b) {
 	return color;
 }
 
+// We use this function to convert from 32 bit word to 1 color value (r or g or b)
+uint8_t splitColor(uint32_t color, char value) {
+	switch ( value ) {
+    case 'r': return (uint8_t)(color >> 16);
+    case 'g': return (uint8_t)(color >>  8);
+    case 'b': return (uint8_t)(color >>  0);
+    default:  return 0;
+  }
+}
+
 // We use this function to light the strip number n
 void stepOn(uint8_t n, uint32_t ledColor) {
 	for (uint8_t i = 0; i < NUMLED[n]; i++){
   	strip[n].setPixelColor(i, ledColor);
+  	}
+	strip[n].show();
+}
+
+// Same as above but with rgb values
+void stepOnRGB(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
+	for (uint8_t i = 0; i < NUMLED[n]; i++){
+  	strip[n].setPixelColor(i, r, g, b);
   	}
 	strip[n].show();
 }
@@ -92,7 +106,7 @@ void leftSlideStepOn(uint8_t n, uint32_t ledColor) {
 	for (uint8_t i = 0; i < NUMLED[n]; i++){
   	strip[n].setPixelColor(i, ledColor);
 		strip[n].show();
-		delay(1);
+		delay(2);
   	}
 }
 
@@ -102,7 +116,7 @@ void rightSlideStepOn(uint8_t n, uint32_t ledColor) {
 		uint8_t j = NUMLED[n] - 1 - i;
 		strip[n].setPixelColor(j, ledColor);
 		strip[n].show();
-		delay(1);
+		delay(2);
   	}
 }
 
@@ -240,16 +254,6 @@ void goDownStyleAnim() {
 	}
 }
 
-/*
-In this function we first switch on a step and then we wait a delay before we switch it off
-We need to pass the number of the step and the delay in ms
-*/
-void stepOnFewInstants(uint8_t n, uint32_t someDelay) {
-	stepOn(n, highBrightnessColor);
-	delay(someDelay);
-	stepOff(n);
-}
-
 void setup() {
 
 // Setting pins to OUTPUT mode for led strips
@@ -272,10 +276,6 @@ initStrips();
 	}
 highBrightnessColor = calculateColor(HIGH_R, HIGH_G, HIGH_B);
 lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
-red = calculateColor(64, 0, 0);
-green = calculateColor(0, 64, 0);
-blue = calculateColor(0, 0, 64);
-yellow = calculateColor(64, 64, 0);
 }
 
 void loop() {
