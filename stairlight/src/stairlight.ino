@@ -40,19 +40,24 @@ const uint8_t PIN[] = {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
 const uint8_t topPirPin = 2;
 const uint8_t bottomPirPin = 3;
 
+// Let's define the pins for luminosity reading
+const uint8_t photoCellPin = 0xA0; // the cell and 10K pulldown are connected to a0
+
 // Let's declare our ledstrips
 Adafruit_NeoPixel strip[NUMSTEPS];
 
 // Let's declare some variables
 uint32_t lowBrightnessColor = 0;
 uint32_t highBrightnessColor = 0;
-uint16_t longDelay = 600;
+uint16_t longDelay = 500;
 uint16_t shortDelay = 70;
 uint16_t arrivedUpDelay = 7000;
 uint16_t wantToGoDownDelay = 7000;
 uint16_t offDelay = 2000;
 uint8_t upGoing = 0;
 uint8_t downGoing = 0;
+uint16_t photoCellReading = 0;
+uint16_t lumValue = 450;
 
 /*
 When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
@@ -279,19 +284,17 @@ lowBrightnessColor = calculateColor(LOW_R, LOW_G, LOW_B);
 }
 
 void loop() {
+	photoCellReading = analogRead(photoCellPin);
+
 	upGoing = digitalRead(bottomPirPin); // Read value of bottom PIR sensor
-	if (upGoing == HIGH) { // if motion detected, launches the go up animation
+	if ((upGoing == HIGH) && (photoCellReading < lumValue)) { // if motion detected and low luminosity, launches the go up animation
 		goUpStyleAnim();
 		delay(offDelay);
 	}
 	downGoing = digitalRead(topPirPin); // Read value of top PIR sensor
-	if (downGoing == HIGH) { // if motion detected, launches the go down animation
+	if ((downGoing == HIGH) && (photoCellReading < lumValue)) { // if motion detected and low luminosity, launches the go down animation
 		goDownStyleAnim();
 		delay(offDelay);
 	}
 	delay(shortDelay);
-	/*goUpAnim();
-	delay(3000);
-	goDownAnim();
-	delay(3000);*/
 }
